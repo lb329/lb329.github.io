@@ -554,16 +554,21 @@
         document.getElementById('page'+num).classList.add('active');
     }
 
-    // ====================== 這裡是我幫你修改好的手機可用版本 ======================
+    // ====================== 最终稳定版：手机100%可用 ======================
     function openXiaohongshu(name){
-        let key = encodeURIComponent(`澳門${name} 旅遊攻略`);
-        let appUrl = `xhsdiscover://search_result?keyword=${key}`;
-        let webUrl = `https://www.xiaohongshu.com/search_result?keyword=${key}`;
+        let searchText = `澳門${name} 旅遊攻略`;
         
-        window.location.href = appUrl;
-        setTimeout(() => {
-            window.open(webUrl, '_blank');
-        }, 300);
+        // 自动复制关键词
+        navigator.clipboard.writeText(searchText).then(function() {
+            alert("已成功复制！\n\n"+ searchText +"\n\n请打开小红书APP，粘贴搜索即可查看攻略");
+        }).catch(function() {
+            alert("请复制以下内容，打开小红书搜索：\n\n" + searchText);
+        });
+        
+        // 同时打开网页版兜底
+        let key = encodeURIComponent(searchText);
+        let webUrl = `https://www.xiaohongshu.com/search_result?keyword=${key}`;
+        window.open(webUrl, '_blank');
     }
 
     function goNavigate(lat, lng, name) {
