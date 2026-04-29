@@ -554,10 +554,16 @@
         document.getElementById('page'+num).classList.add('active');
     }
 
+    // ====================== 這裡是我幫你修改好的手機可用版本 ======================
     function openXiaohongshu(name){
         let key = encodeURIComponent(`澳門${name} 旅遊攻略`);
-        let url = `https://www.xiaohongshu.com/search_result?keyword=${key}`;
-        window.open(url, '_blank');
+        let appUrl = `xhsdiscover://search_result?keyword=${key}`;
+        let webUrl = `https://www.xiaohongshu.com/search_result?keyword=${key}`;
+        
+        window.location.href = appUrl;
+        setTimeout(() => {
+            window.open(webUrl, '_blank');
+        }, 300);
     }
 
     function goNavigate(lat, lng, name) {
@@ -565,14 +571,12 @@
         window.open(url, '_blank');
     }
 
-    // ✅ 這裡是修復後的頂部高德搜索 + 直接導航
     function searchAmap(){
         let kw = document.getElementById('mapSearch').value.trim();
         if(!kw){
             alert('請輸入地點名稱');
             return;
         }
-        // 重點：跳轉高德官方導航鏈接，自動定位 + 規劃路線
         let target = "澳門 " + kw;
         let url = `https://uri.amap.com/search?keyword=${encodeURIComponent(target)}&city=820000`;
         window.open(url, '_blank');
