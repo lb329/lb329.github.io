@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>澳門景點地圖 - 美食+導航</title>
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:"Microsoft YaHei",sans-serif;
+        }
+        body{
+            background:#f6f0e4;
+            background-image:
+            url("https://img0.baidu.com/it/u=3609799228,2870902123&fm=253&fmt=auto"),
+            url("https://img2.baidu.com/it/u=2276961339,1679392322&fm=253&fmt=auto");
+            background-size: 280px, cover;
+            background-repeat: repeat, no-repeat;
+            background-attachment: fixed;
+            background-blend-mode: soft-light, overlay;
+            padding-bottom:80px;
+        }
+        .header{
+            background:#8c3c3c;
+            color:white;
+            padding:20px;
+            text-align:center;
+            font-size:22px;
+            font-weight:bold;
+            letter-spacing:2px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .search-bar{
+            background:rgba(255,255,255,0.92);
+            padding:15px;
+            position:sticky;
+            top:0;
+            z-index:999;
+        }
+        .search-input{
+            width:100%;
+            padding:12px 18px;
+            border:1px solid #d1c2ad;
+            border-radius:30px;
+            font-size:16px;
+            outline:none;
+            background:#fffbf5;
+        }
+        .tip{
+            background:rgba(156,44,44,0.1);
+            color:#8c3c3c;
+            padding:12px;
+            text-align:center;
+            margin:10px 15px;
+            border-radius:10px;
+            font-weight:bold;
+        }
+        .container{
+            padding:15px;
+        }
+        .card{
+            background:rgba(255,255,255,0.95);
+            border-radius:15px;
+            margin-bottom:20px;
+            box-shadow:0 4px 12px rgba(90, 62, 54, 0.12);
+            border: 1px solid #e8dfd0;
+            cursor:default;
+        }
+        .card-body{
+            padding:18px;
+        }
+        .card-title{
+            font-size:20px;
+            font:bold;
+            margin-bottom:8px;
+            color:#4f3730;
+            cursor:pointer;
+            padding:5px 0;
+        }
+        .card-title:hover{
+            color:#8c3c3c;
+            text-decoration: underline;
+        }
+        .card-desc{
+            color:#6b5c54;
+            line-height:1.6;
+            margin-bottom:10px;
+        }
+        .food-title{
+            color:#8c3c3c;
+            font-weight:bold;
+            margin-top:10px;
+            margin-bottom:5px;
+        }
+        .food-list{
+            color:#555;
+            line-height:1.8;
+            margin-bottom:15px;
+        }
+        .btn{
+            display:inline-block;
+            background:#3474bb;
+            color:white;
+            padding:10px 18px;
+            border-radius:10px;
+            text-decoration:none;
+            font-weight:bold;
+            margin-right:10px;
+            margin-bottom:8px;
+            border:none;
+            cursor:pointer;
+            font-size:14px;
+            transition: 0.2s ease;
+        }
+        .btn:hover{
+            background:#285f99;
+        }
+        .footer{
+            position:fixed;
+            bottom:0;
+            left:0;
+            width:100%;
+            background:rgba(255,255,255,0.95);
+            display:flex;
+            padding:12px;
+            border-top:1px solid #d1c2ad;
+            z-index:999;
+        }
+        .footer button{
+            flex:1;
+            padding:14px;
+            background:#8c3c3c;
+            color:white;
+            border:none;
+            border-radius:12px;
+            font-size:16px;
+            font-weight:bold;
+            margin:0 5px;
+            cursor:pointer;
+        }
+        .page{
+            display:none;
+        }
+        .page.active{
+            display:block;
+        }
+
+        .ai-travel-wrap{
+            padding:15px;
+            height: calc(100vh - 220px);
+            display:flex;
+            flex-direction:column;
+        }
+        .ai-title{
+            font-size:20px;
+            font-weight:bold;
+            color:#4f3730;
+            text-align:center;
+            margin-bottom:15px;
+        }
+        .ai-desc{
+            color:#6b5c54;
+            text-align:center;
+            margin-bottom:15px;
+            line-height:1.5;
+        }
+        .ai-chat-box{
+            flex:1;
+            background:rgba(255,255,255,0.95);
+            border-radius:15px;
+            border:1px solid #e8dfd0;
+            box-shadow:0 4px 12px rgba(90, 62, 54, 0.12);
+            padding:15px;
+            overflow:hidden;
+        }
+        .ai-chat-box iframe{
+            width:100%;
+            height:100%;
+            border:none;
+            border-radius:10px;
+        }
+</style>
+</head>
+<body>
+
+<div class="header">澳門熱門景點旅游導航</div>
+
+<div class="search-bar">
+    <div style="font-weight:bold; margin-bottom:6px; color:#8c3c3c;">🗺️ 高德地圖 直接導航</div>
+    <div style="font-size:14px; color:#666; margin-bottom:10px;">輸入澳門景點/美食/酒店 → 一鍵導航</div>
+
+    <input class="search-input" id="mapSearch" placeholder="🔍 例如：大三巴、官也街、威尼斯人">
+    <button onclick="searchAmap()" class="btn" style="width:100%;margin-top:12px;padding:14px;font-size:16px;">🧭 開始高德導航</button>
+</div>
+
+<div class="tip">👉 點擊景點名稱查看小紅書攻略｜🧭 點擊按鈕直接導航</div>
+
+<div id="page1" class="page active">
+    <div class="container">
+
+        <div class="card">
+            <div class="card-body">
+                <div class="card-title" onclick="openXiaohongshu('大三巴牌坊')">大三巴牌坊</div>
+                <div class="card-desc">澳門標誌性世界文化遺產，中西合璧古典石雕建築，老城必遊打卡地。</div>
+                <div class="food-title">附近美食</div>
+                <div class="food-list">
+                    1. 義順牛奶公司｜招牌：雙皮燉奶、姜汁撞奶<br>
+                    2. 瑪嘉烈葡撻｜招牌：經典葡式蛋撻<br>
+                    3. 恆友魚蛋｜招牌：咖喱魚蛋、豬腳薑<br>
+                    4. 檸檬車露｜招牌：手工雪糕
+                </div>
+                <button class="btn" onclick="goNavigate(22.1939,113.5417,'大三巴牌坊')">🧭 導航到大三巴</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="card-title" onclick="openXiaohongshu('議事亭前地')">議事亭前地</div>
+                <div class="card-desc">澳門市中心葡式廣場，波浪紋碎石路面，周邊歐式古建密集。</div>
+                <div class="food-title">附近美食</div>
+                <div class="food-list">
+                    1. 鉅記手信｜招牌：肉乾、杏仁餅<br>
+                    2. 咀香園餅家｜招牌：炭燒杏仁餅<br>
+                    3. 公雞葡國餐廳｜招牌：葡國雞、葡式烤乳豬
+                </div>
+                <button class="btn" onclick="goNavigate(22.1928,113.5408,'議事亭前地')">🧭 導航到議事亭</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="card-title" onclick="openXiaohongshu('媽閣廟')">媽閣廟</div>
+                <div class="card-desc">澳門最古老廟宇，媽祖信仰聖地，見證澳門數百年發展歷史。</div>
+                <div class="food-title">附近美食</div>
+                <div class="food-list">
+                    1. 亞利咖哩美食｜招牌：咖哩牛腩河粉<br>
+                    2. 下環肥鵝餐室｜招牌：燒鵝飯、叉燒飯<br>
+                    3. 老街茶餐廳｜招牌：港式奶茶、菠蘿油
+                </div>
+                <button class="btn" onclick="goNavigate(22.1853,113.5331,'媽閣廟')">🧭 導航到媽閣廟</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="card-title" onclick="openXiaohongshu('大炮台')">大炮台</div>
+                <div class="card-desc">百年西式軍事炮台，緊鄰大三巴，登高可俯瞰澳門半島老城全景。</div>
+                <div class="food-title">附近美食</div>
+                <div class="food-list">
+                    1. 牛記咖喱美食｜招牌：咖喱牛雜麵<br>
+                    2. 新馬路小吃｜招牌：魚蛋粉、格仔餅
+                </div>
+                <button class="btn" onclick="goNavigate(22.1942,113.5414,'大炮台')">🧭 導航到大炮台</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="card-title" onclick="openXiaohongshu('東望洋燈塔')">東望洋燈塔</div>
+                <div class="card-desc">遠東地區古老燈塔，澳門三大古蹟之一，山林環繞視野開闊。</div>
+                <div class="food-title">附近美食</div>
+                <div class="food-list">
+                    1. 華星冰室｜招牌：沙嗲牛肉麵、凍檸茶<br>
+                    2. 勝利茶餐廳｜招牌：乾炒牛河、奶油豬
+                </div>
+                <button class="btn" onclick="goNavigate(22.1978,113.5542,'東望洋燈塔')">🧭 導航到燈塔</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="card-title" onclick="openXiaohongshu('玫瑰堂')">玫瑰堂</div>
+                <div class="card-desc">明黃色巴洛克風格教堂，內部雕刻與祭壇精緻，澳門文藝打卡聖地。</div>
+                <div class="food-title">附近美食</div>
+                <div class="food-list">
+                    1. 義順牛奶｜招牌：雙皮奶<br>
+                    2. 潘威記魚蛋｜招牌：招牌魚蛋、魯肉飯
+                </div>
+                <button class="btn" onclick="goNavigate(22.1929,113.5402,'玫瑰堂')">🧭 導航到玫瑰堂</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="card-title" onclick="openXiaohongshu('澳門威尼斯人')">澳門威尼斯人</div>
+                <div class="card-desc">氹仔頂級綜合度假村，人造天空、運河與貢多拉船，集購物娛樂於一體。</div>
+                <div class="food-title">附近美食</div>
+                <div class="food-list">
+                    1. 安德魯餅店｜招牌：葡式蛋撻<br>
+                    2. 四季名店美食廣場｜多國料理
+                </div>
+                <button class="btn" onclick="goNavigate(22.1478,113.5736,'威尼斯人')">🧭 導航到威尼斯人</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="card-title" onclick="openXiaohongshu('澳門巴黎人鐵塔')">巴黎人鐵塔</div>
+                <div class="card-desc">還原巴黎鐵塔經典外觀，夜間燈光秀浪漫夢幻，路氹城標誌打卡點。</div>
+                <div class="food-title">附近美食</div>
+                <div class="food-list">
+                    1. 添好運點心｜招牌：酥皮焗叉燒包<br>
+                    2. 巴黎人美食廣場｜招牌：法式甜點
+                </div>
+                <button class="btn" onclick="goNavigate(22.1481,113.5771,'巴黎人')">🧭 導航到巴黎人</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="card-title" onclick="openXiaohongshu('官也街')">官也街</div>
+                <div class="card-desc">氹仔舊城美食老街，彩色葡式小屋林立，手信與特色小吃聚集地。</div>
+                <div class="food-title">附近美食</div>
+                <div class="food-list">
+                    1. 莫義記｜招牌：木糠布甸、大菜糕<br>
+                    2. 榮記豆腐｜招牌：豆腐花、豆漿<br>
+                    3. 誠昌飯店｜招牌：水蟹粥、海鮮餐
+                </div>
+                <button class="btn" onclick="goNavigate(22.1511,113.5658,'官也街')">🧭 導航到官也街</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="card-title" onclick="openXiaohongshu('龍環葡韻')">龍環葡韻</div>
+                <div class="card-desc">澳門八景之一，薄荷綠葡式別墅群搭配濕地湖景，文治風拍照勝地。</div>
+                <div class="food-title">附近美食</div>
+                <div class="food-list">
+                    1. 木偶葡國餐廳｜招牌：葡式焗飯<br>
+                    2. 嘉樂巴甜品｜招牌：木糠布甸
+                </div>
+                <button class="btn" onclick="goNavigate(22.1531,113.5631,'龍環葡韻')">🧭 導航到龍環葡韻</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="card-title" onclick="openXiaohongshu('澳門漁人碼頭')">澳門漁人碼頭</div>
+                <div class="card-desc">羅馬古風海濱園區，異國建築成群，臨海散步、日落拍攝絕佳地點。</div>
+                <div class="food-title">附近美食</div>
+                <div class="food-list">
+                    1. 航海主題餐廳｜招牌：海鮮拼盤<br>
+                    2. 濱海景觀餐廳｜招牌：葡式燒烤
+                </div>
+                <button class="btn" onclick="goNavigate(22.1911,113.5661,'漁人碼頭')">🧭 導航到漁人碼頭</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="card-title" onclick="openXiaohongshu('澳門旅遊塔')">澳門旅遊塔</div>
+                <div class="card-desc">澳門高空地標，360度觀景台、極限運動設施，俯瞰全澳夜景。</div>
+                <div class="food-title">附近美食</div>
+                <div class="food-list">
+                    1. 旅遊塔旋轉餐廳｜招牌：自助晚餐<br>
+                    2. 灣區咖啡廳｜招牌：下午茶套餐
+                </div>
+                <button class="btn" onclick="goNavigate(22.1817,113.5561,'旅遊塔')">🧭 導航到旅遊塔</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="card-title" onclick="openXiaohongshu('澳門黑沙海灘')">黑沙海灘</div>
+                <div class="card-desc">路環天然黑色沙質海灘，環境清靜，適合郊遊、野餐與海邊休憩。</div>
+                <div class="food-title">附近美食</div>
+                <div class="food-list">
+                    1. 黑沙燒烤場｜招牌：海鮮燒烤<br>
+                    2. 路環小食店｜招牌：魚蛋、燒賣
+                </div>
+                <button class="btn" onclick="goNavigate(22.1278,113.5861,'黑沙海灘')">🧭 導航到黑沙灘</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="card-title" onclick="openXiaohongshu('盧廉若公園')">盧廉若公園</div>
+                <div class="card-desc">澳門罕見江南蘇式園林，亭台樓閣、假山池水，鬧市中的寧靜綠洲。</div>
+                <div class="food-title">附近美食</div>
+                <div class="food-list">
+                    1. 荷蘭園茶餐廳｜招牌：叉燒飯、凍奶茶<br>
+                    2. 老式糖水鋪｜招牌：芝麻糊、紅豆沙
+                </div>
+                <button class="btn" onclick="goNavigate(22.1986,113.5478,'盧廉若公園')">🧭 導航到公園</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="card-title" onclick="openXiaohongshu('路環聖方濟各聖堂')">路環聖方濟各聖堂</div>
+                <div class="card-desc">奶白色簡約歐式聖堂，搭配路環彩色小巷，小眾治愈系拍照景點。</div>
+                <div class="food-title">附近美食</div>
+                <div class="food-list">
+                    1. 安德魯餅店總店｜招牌：經典葡撻<br>
+                    2. 路環茶餐廳｜招牌：港式早餐
+                </div>
+                <button class="btn" onclick="goNavigate(22.1353,113.5736,'聖方濟各聖堂')">🧭 導航到聖堂</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="card-title" onclick="openXiaohongshu('鄭家大屋')">鄭家大屋</div>
+                <div class="card-desc">世界文化遺產，嶺南大宅融合葡式建築設計，完美展現澳門中西交融特色。</div>
+                <div class="food-title">附近美食</div>
+                <div class="food-list">
+                    1. 下環咖哩美食｜招牌：咖哩魚蛋<br>
+                    2. 老街粥麵店｜招牌：及第粥、炸兩
+                </div>
+                <button class="btn" onclick="goNavigate(22.1881,113.5317,'鄭家大屋')">🧭 導航到鄭家大屋</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="card-title" onclick="openXiaohongshu('亞婆井前地')">亞婆井前地</div>
+                <div class="card-desc">葡式百年老巷廣場，古樹環繞巷弄清幽，遠離人潮的文藝小眾景點。</div>
+                <div class="food-title">附近美食</div>
+                <div class="food-list">
+                    1. 西灣茶餐廳｜招牌：乾炒牛河<br>
+                    2. 街坊小食｜招牌：魚蛋、燒賣
+                </div>
+                <button class="btn" onclick="goNavigate(22.1906,113.5361,'亞婆井前地')">🧭 導航到亞婆井</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="card-title" onclick="openXiaohongshu('仁慈堂大樓')">仁慈堂大樓</div>
+                <div class="card-desc">澳門最古老慈善機構建築，新古典歐式外觀，見證中西文化交融歷史。</div>
+                <div class="food-title">附近美食</div>
+                <div class="food-list">
+                    1. 新馬路小吃｜招牌：格仔餅、魚蛋<br>
+                    2. 傳統茶餐廳｜招牌：菠蘿油、奶茶
+                </div>
+                <button class="btn" onclick="goNavigate(22.1925,113.5406,'仁慈堂')">🧭 導航到仁慈堂</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="card-title" onclick="openXiaohongshu('澳門倫敦人')">澳門倫敦人</div>
+                <div class="card-desc">還原英倫復古街景，大笨鐘、紅色電話亭標誌建築，歐洲復古風商業度假城。</div>
+                <div class="food-title">附近美食</div>
+                <div class="food-list">
+                    1. 邱吉爾餐廳｜招牌：英式下午茶<br>
+                    2. 倫敦人美食廣場｜多國精緻料理
+                </div>
+                <button class="btn" onclick="goNavigate(22.1483,113.5792,'倫敦人')">🧭 導航到倫敦人</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="card-title" onclick="openXiaohongshu('永利皇宮')">永利皇宮</div>
+                <div class="card-desc">頂級奢華度假村，空中纜車、大型音樂噴泉，日夜景觀皆華麗震撼。</div>
+                <div class="food-title">附近美食</div>
+                <div class="food-list">
+                    1. 永利咖啡廳｜招牌：精緻甜品<br>
+                    2. 皇宮中餐廳｜招牌：粵菜點心
+                </div>
+                <button class="btn" onclick="goNavigate(22.1467,113.5806,'永利皇宮')">🧭 導航到永利皇宮</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="card-title" onclick="openXiaohongshu('澳門戀愛巷')">戀愛巷</div>
+                <div class="card-desc">大三巴旁彩色浪漫小巷，牆面色彩繽紛，情侶與網紅必打卡小众街巷。</div>
+                <div class="food-title">附近美食</div>
+                <div class="food-list">
+                    1. 戀愛巷咖啡｜招牌：特調咖啡、戚風蛋糕<br>
+                    2. 大三巴小食｜招牌：串燒、奶茶
+                </div>
+                <button class="btn" onclick="goNavigate(22.1936,113.5408,'戀愛巷')">🧭 導航到戀愛巷</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="card-title" onclick="openXiaohongshu('澳門銀河度假村')">澳門銀河度假村</div>
+                <div class="card-desc">路氹城大型綜合度假城，集購物、娛樂、酒店、賭場於一體，空中水上樂園知名。</div>
+                <div class="food-title">附近美食</div>
+                <div class="food-list">
+                    1. 銀河美食匯｜招牌：日式拉麵、壽司<br>
+                    2. 麗思咖啡廳｜招牌：高級下午茶
+                </div>
+                <button class="btn" onclick="goNavigate(22.1444,113.5831,'銀河')">🧭 導航到銀河</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="card-title" onclick="openXiaohongshu('新八佰伴百貨')">新八佰伴百貨</div>
+                <div class="card-desc">澳門半島老牌大型綜合商場，潮流服飾、化妝品、生活百貨一應俱全。</div>
+                <div class="food-title">附近美食</div>
+                <div class="food-list">
+                    1. 商場美食閣｜招牌：日式拉麵<br>
+                    2. 水坑尾小食｜招牌：港式魚蛋粉
+                </div>
+                <button class="btn" onclick="goNavigate(22.1947,113.5453,'新八佰伴')">🧭 導航到新八佰伴</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="card-title" onclick="openXiaohongshu('澳門美高梅酒店')">澳門美高梅酒店</div>
+                <div class="card-desc">澳門半島臨海豪華酒店，藝術風室內設計，結合娛樂、購物與高端餐飲。</div>
+                <div class="food-title">附近美食</div>
+                <div class="food-list">
+                    1. 美高梅甜品屋｜招牌：芒果布丁、蛋糕<br>
+                    2. 海濱餐廳｜招牌：海鮮料理
+                </div>
+                <button class="btn" onclick="goNavigate(22.1903,113.5617,'美高梅')">🧭 導航到美高梅</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="card-title" onclick="openXiaohongshu('氹仔中央廣場')">氹仔中央廣場</div>
+                <div class="card-desc">氹仔市中心便民商場，鄰近官也街，集日常購物、影院、餐飲為一體。</div>
+                <div class="food-title">附近美食</div>
+                <div class="food-list">
+                    1. 廣場餐廳｜招牌：港式燒臘<br>
+                    2. 氹仔老街小食｜招牌：豬扒包、魚蛋
+                </div>
+                <button class="btn" onclick="goNavigate(22.1522,113.5642,'氹仔中央廣場')">🧭 導航到中央廣場</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div id="page2" class="page">
+    <div class="ai-travel-wrap">
+        <div class="ai-title">🤖 澳門旅遊智能規劃助手</div>
+        <div class="ai-desc">可咨詢行程規劃、景點推薦、美食攻略、路線安排，為你定制專屬澳門旅途</div>
+        <div class="ai-chat-box">
+            <iframe src="https://www.doubao.com/chat" allowfullscreen></iframe>
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    <button onclick="switchPage(1)">🏞️ 熱門景點</button>
+    <button onclick="switchPage(2)">🤖 旅遊智能助手</button>
+</div>
+
+<script>
+    function switchPage(num){
+        document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+        document.getElementById('page'+num).classList.add('active');
+    }
+
+    function openXiaohongshu(name){
+        let key = encodeURIComponent(`澳門${name} 旅遊攻略`);
+        let url = `https://www.xiaohongshu.com/search_result?keyword=${key}`;
+        window.open(url, '_blank');
+    }
+
+    function goNavigate(lat, lng, name) {
+        let url = `https://uri.amap.com/navigation?to=${lng},${lat},${encodeURIComponent(name)}&mode=car&policy=1`;
+        window.open(url, '_blank');
+    }
+
+    // ✅ 這裡是修復後的頂部高德搜索 + 直接導航
+    function searchAmap(){
+        let kw = document.getElementById('mapSearch').value.trim();
+        if(!kw){
+            alert('請輸入地點名稱');
+            return;
+        }
+        // 重點：跳轉高德官方導航鏈接，自動定位 + 規劃路線
+        let target = "澳門 " + kw;
+        let url = `https://uri.amap.com/search?keyword=${encodeURIComponent(target)}&city=820000`;
+        window.open(url, '_blank');
+    }
+
+    document.getElementById('mapSearch').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            searchAmap();
+        }
+    });
+</script>
+</body>
+</html>
